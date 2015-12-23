@@ -9,7 +9,7 @@ func NewCore () *Core {
 	core.tok = NewTokenizer();
 	return core;
 }
-func (c *Core) Exec(config Config, prog string) error {
+func (c *Core) Exec(config *Config, prog string) error {
 
 
 	return nil

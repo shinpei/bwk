@@ -5,55 +5,79 @@ import (
 	"os"
 	"strings"
 )
+// for making Pair of two
+type FlagPhasePair struct {
+	acc FlagAcceptor
+	phase ArgParsingPhase
+}
 
-func Usage(flags map[string]FlagAcceptor) {
+func Usage(flags map[string]FlagPhasePair) {
 	fmt.Println("Usage: ")
 	fmt.Println("\t./bwk [options] [argsuments...]")
 	fmt.Println("Options:")
 	for opt, f := range flags {
-		fmt.Printf("\t" + opt + "\t" + f.Desc() + "\n")
+		fmt.Printf("\t" + opt + "\t" + f.acc.Desc() + "\n")
 	}
 	fmt.Println("Arguments:")
 	fmt.Println("\tFiles you want to use as an input")
 }
+type ArgParsingPhase int
+const (
+DELIM_PHASE ArgParsingPhase = iota
+VAR_PHASE
+PROGFILE_PHASE
+PROG_PHASE
+)
+
 
 func main() {
 	sFlag := NewDelimiterFlag(" ");
 	vFlag := &VarFlag{}
 	pFlag := &ProgFlag{}
-	flags := map[string]FlagAcceptor{
-		"-F": sFlag,
-		"-v": vFlag,
-		"-f": pFlag,
+
+
+	flags := map[string]FlagPhasePair{
+		"-F": {sFlag, DELIM_PHASE},
+		"-v": {vFlag, VAR_PHASE},
+		"-f": {pFlag, PROGFILE_PHASE},
 	}
+
 	args := os.Args
 	if len(args) < 2 {
 		Usage(flags)
 		return
 	}
-
+	var phase ArgParsingPhase;
+	var flagAcc FlagAcceptor;
+	var prog string =""
 	for _, arg := range args[1:] {
 		// let's see how's flag
 		if strings.HasPrefix(arg, "-") {
 			// it seems a flag, and assumed it's a single char
-			acc := flags[arg[:2]]
-			if acc != nil {
-				acc.Accept(arg[:2])
+			flagAcc = flags[arg[:2]].acc
+			phase = flags[arg[:2]].phase;
+			if flagAcc != nil {
+				flagAcc.Accept(arg[:2])
 			} else {
 				// no such flag
 				fmt.Println("No such flag as '" + arg[:2] + "'")
+				Usage(flags)
+				return
 			}
 		} else {
 			// seems it's an argument or the last part
-
+			switch phase {
+				case DELIM_PHASE:
+				flagAcc.Accept(arg);
+			case PROG_PHASE:
+				prog = arg
+			}
 		}
 	}
-	config := Config{
-		Delimiter:sFlag.PopValue(),
-	}
-
+	config := NewConfig();
+	config.Print()
 	core := NewCore();
 
-	core.Exec(config, "");
+	core.Exec(config, prog);
 
 }
