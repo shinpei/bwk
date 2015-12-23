@@ -5,17 +5,17 @@ type Parser struct {
 
 }
 
-type AST struct {
+type Node struct {
 
 }
 
-func (ast *AST) String() string{
+func (node *Node) String() string{
 return ""
 }
 
-func (p *Parser) Parse(tokens *[]Token) *AST{
-	ast := new(AST)
-	return ast
+func (p *Parser) Parse(tokens *[]Token) *Node {
+	node := new(Node)
+	return node
 }
 
 func NewParser() *Parser {

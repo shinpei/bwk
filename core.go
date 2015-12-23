@@ -19,7 +19,7 @@ func (c *Core) Exec(config *Config, prog string) (err error) {
 	if err != nil {
 		return err
 	}
-	ast := c.parser.Parse(tks);
-	fmt.Println(ast.String())
+	root := c.parser.Parse(tks);
+	fmt.Println(root.String())
 	return nil
 }
