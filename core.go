@@ -14,12 +14,12 @@ func NewCore () *Core {
 
 func (c *Core) Exec(config *Config, prog string) (err error) {
 
-	tks, err := c.tok.Tokenize(prog)
+	tokens, err := c.tok.Tokenize(prog)
 
 	if err != nil {
 		return err
 	}
-	root := c.parser.Parse(tks);
+	root := c.parser.Parse(tokens);
 	fmt.Println(root.String())
 	return nil
 }

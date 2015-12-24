@@ -3,10 +3,15 @@ package main
 type Tokenizer struct {
 }
 
-type Token int
+type TokenNode struct{
+	ttype TokenType
+	body string
+	// TODO: position for debugging
+}
+type TokenType int
 
 const (
-	ILLEGAL Token = iota
+	ILLEGAL TokenType = iota
 	EOF
 	COMMENT
 
@@ -103,23 +108,23 @@ var tokens = [...]string{
 	EXIT:   "exit",
 }
 
-var keywords map[string]Token
+var keywords map[string]TokenType
 
-func (tok Token) IsKeyword() bool {
+func (tok TokenType) IsKeyword() bool {
 	return keyword_begin < tok && tok <= keyword_end
 }
 
-func (tok Token) IsLiteral() bool {
+func (tok TokenType) IsLiteral() bool {
 	return literal_begin < tok && tok <= literal_end
 }
 
-func (tok Token) IsOperator() bool {
+func (tok TokenType) IsOperator() bool {
 	return operator_begin < tok && tok <= operator_end
 }
 
 func NewTokenizer() *Tokenizer {
 	tok := new(Tokenizer)
-	keywords = make(map[string]Token)
+	keywords = make(map[string]TokenType)
 	for i := keyword_begin + 1; i < keyword_end; i++ {
 		keywords[tokens[i]] = i
 	}
@@ -127,14 +132,16 @@ func NewTokenizer() *Tokenizer {
 }
 
 // snip from golang
-func Lookup (ident string) Token {
+func Lookup (ident string) TokenType {
 	if tok, is_keyword := keywords[ident]; is_keyword {
 		return tok
 	}
 	return SYMBOL
 }
-func (t *Tokenizer) Tokenize(line string) (tokens *[]Token, err error) {
-	tokens = new([]Token)
+
+
+func (t *Tokenizer) Tokenize(line string) (tokens *[]TokenType, err error) {
+	tokens = new([]TokenType)
 
 	return tokens, nil
 }
