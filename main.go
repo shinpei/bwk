@@ -47,6 +47,7 @@ func main() {
 		Usage(flags)
 		return
 	}
+
 	var phase ArgParsingPhase;
 	var flagAcc FlagAcceptor;
 	var prog string =""
@@ -67,7 +68,7 @@ func main() {
 		} else {
 			// seems it's an argument or the last part
 			switch phase {
-				case DELIM_PHASE:
+			case DELIM_PHASE:
 				flagAcc.Accept(arg);
 			case PROG_PHASE:
 				prog = arg
@@ -77,7 +78,7 @@ func main() {
 	config := NewConfig();
 	config.Print()
 	core := NewCore();
-
+	println("prog: " + prog)
 	core.Exec(config, prog);
 
 }

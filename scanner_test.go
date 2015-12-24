@@ -7,11 +7,11 @@ func TestScan(t *testing.T) {
 		t.Errorf("Error handler called (msg=%s)", msg)
 	}
 
-	source :="hogehoge"
+	source :=[]byte("123  222\n")
 	var s Scanner
 	s.Init(source, eh);
 	for {
-		tok, lit = s.Scan()
-
+		tok, _ := s.Scan()
+		print (tok)
 	}
 }

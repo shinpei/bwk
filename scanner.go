@@ -5,11 +5,14 @@ import (
 
 type Scanner struct {
 	src []byte
+
 	ch rune
 	offset int
 	err ErrorHandler
 	rdOffset int // reading offset
 	lineOffset int
+	insertSemi bool // insert a semicolon before new line
+
 	ErrorCount int
 }
 type ErrorHandler func(msg string)
@@ -17,13 +20,13 @@ type ErrorHandler func(msg string)
 
 // Read a single character
 // simplified go/token/scanner.go
-func (s *Scanner) next(){
+func (s *Scanner) next() {
 	if s.rdOffset < len(s.src) {
 		s.offset = s.rdOffset;
 		if s.ch == '\n' {
 			s.lineOffset = s.offset;
 		}
-		r,w := rune(s.src[s.rdOffset]), 1
+		r, w := rune(s.src[s.rdOffset]), 1
 		switch {
 		case r == 0:
 			s.error(s.offset, "illegal character NUL");
@@ -33,6 +36,7 @@ func (s *Scanner) next(){
 		}
 		s.rdOffset += w
 		s.ch =r
+		println("r=" + string(r))
 	} else{
 		s.offset = len(s.src)
 		if s.ch == '\n'{
@@ -63,6 +67,17 @@ func (s *Scanner) skipWhitespace() {
 	}
 }
 
+func (s *Scanner) scanIdentifier() string {
+	offs := s.offset
+	for isLetter(s.ch) || isDigit(s.ch) {
+		s.next()
+	}
+	return string(s.src[offs:s.offset])
+}
+
+func isDigit(ch rune) bool {
+	return '0' <= ch && ch <= '9' || ch >= 0x80 && unicode.IsDigit(ch)
+}
 
 func isLetter(ch rune) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_' || ch >= 0x80 && unicode.IsLetter(ch)
@@ -75,13 +90,33 @@ func (s *Scanner) error (offs int, msg string) {
 	s.ErrorCount++
 }
 
+
+func digitVal(ch rune) int {
+	switch {
+	case '0' <= ch && ch <= '9':
+		return int(ch - '0')
+	}
+	return 10 // larger than any legal digit val
+}
+
+
+func (s *Scanner) scanNumber() (tok TokenType, lit string) {
+
+	offs := s.offset
+	tok = INT// TODO: Parse float
+
+	for digitVal(s.ch) < 10 {
+		s.next()
+	}
+	return tok, string(s.src[offs: s.offset])
+}
 func (s *Scanner) Scan() (tok TokenType, lit string) {
 	//scanAgain:
 	s.skipWhitespace()
 
-	switch ch:= s.ch; {
+	switch ch := s.ch; {
 	case isLetter(ch):
-		//lit = s.scanIdentifier()
+		lit = s.scanIdentifier()
 		if len(lit) > 1 {
 			// keywords are longer than one letter.
 			tok = Lookup(lit)
@@ -90,8 +125,29 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 
 			}
 		}else {
+
 			tok = SYMBOL
+
+		}
+	case '0' <= ch && ch <= '9':
+		tok, lit = s.scanNumber()
+	default:
+		s.next()
+		switch ch {
+		case -1:
+			println("ch ='" + string(ch) + "'")
+			if s.insertSemi{
+				s.insertSemi = false
+				return SEMICOLON, "\n"
+			}
+			tok = EOF
+		case '\n':
+			s.insertSemi = false
+			return SEMICOLON, "\n"
+		default:
+			lit = string(ch)
 		}
 	}
+
 	return
 }
