@@ -77,11 +77,12 @@ func main() {
 			}
 		}
 	}
+
 	config := NewConfig();
 	config.Delimiter = sFlag.PopString();
 	config.Print()
 	core := NewCore();
-	println("prog: " + prog)
+	println("prog: '" + prog + "'")
 	core.Exec(config, prog);
 
 }

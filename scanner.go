@@ -183,6 +183,10 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 			tok = LBRACE
 		case '}':
 			tok = RBRACE
+		case ',':
+			tok = COMMA
+		case '.':
+			tok = DOT
 		case '$':
 			// special or symbol
 			if isLetter(s.ch) {

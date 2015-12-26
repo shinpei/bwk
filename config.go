@@ -6,8 +6,8 @@ import (
 
 const display = `
 Delimiter: {{.Delimiter}}
-Defined variables:
-ProgFile : {{.ProgFile}}
+Defined variable: {{.Variables}}
+ProgFile: {{.ProgFile}}
 `
 
 type Config struct {
@@ -25,4 +25,5 @@ func NewConfig() *Config {
 
 func (c *Config) Print() {
 	c.template.Execute(os.Stdout, c);
+	println()
 }

@@ -46,6 +46,9 @@ const (
 	COLON // :
 	SEMICOLON // ;
 
+	COMMA
+	DOT
+
 	DOLLAR // $
 
 	// Keywords
@@ -95,6 +98,9 @@ var tokenDefs = [...]string{
 
 	COLON: ":",
 	SEMICOLON: ";",
+
+	COMMA: ",",
+	DOT: ".",
 
 	DOLLAR : "$",
 
@@ -158,7 +164,7 @@ func (t *Tokenizer) Tokenize(src string) (tokens []TokenType, err error) {
 		if tok == EOF {
 			break;
 		}
-		fmt.Println("type=",tokenDefs[tok], ":", lit)
+		fmt.Println("[Token:", tokenDefs[tok], ":", lit, "]")
 		tokens = append(tokens, tok)
 	}
 	return tokens, nil
