@@ -132,6 +132,9 @@ func (tok TokenType) IsLiteral() bool {
 func (tok TokenType) IsOperator() bool {
 	return operator_begin < tok && tok <= operator_end
 }
+func (tok TokenType) String() string{
+	return tokenDefs[tok]
+}
 
 func NewTokenizer() *Tokenizer {
 	tok := new(Tokenizer)

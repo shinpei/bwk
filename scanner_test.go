@@ -21,6 +21,25 @@ func TestScanInt(t *testing.T) {
 	}
 }
 
+func TestScanFloatWithoutLeadingZero(t *testing.T) {
+	source := []byte(".3")
+	var s Scanner
+	s.Init(source, eh)
+	tok, _ := s.Scan()
+	if tok != FLOAT {
+		t.Errorf("expected FLOAT token is not found at 1st place")
+	}
+}
+func TestScanFloat(t *testing.T) {
+	source := []byte(".3")
+	var s Scanner
+	s.Init(source, eh)
+	tok, _ := s.Scan()
+	if tok != FLOAT {
+		t.Errorf("expected FLOAT token is not found at 1st place")
+	}
+}
+
 func TestScanSymbol(t *testing.T) {
 	source := []byte("symbol")
 	var s Scanner
@@ -62,5 +81,15 @@ func TestScanString(t *testing.T) {
 	tok, _ := s.Scan()
 	if tok != STRING {
 		t.Errorf("expected STRING token is not found at 2nd place")
+	}
+}
+
+func TestScanKeywordExit(t *testing.T) {
+	src := []byte("exit \"exit\"");
+	var s Scanner
+	s.Init(src, eh)
+	tok, _ := s.Scan()
+	if tok != EXIT{
+		t.Errorf("sould be exit keyword, but it's ", tok.String())
 	}
 }

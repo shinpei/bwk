@@ -104,15 +104,25 @@ func digitVal(ch rune) int {
 }
 
 
-func (s *Scanner) scanNumber() (tok TokenType,  lit string) {
+func (s *Scanner) scanNumber(seenDecimalPoint bool) (tok TokenType,  lit string) {
 
 	offs := s.offset
 	tok = INT// TODO: Parse float
+
+	if seenDecimalPoint {
+		offs--
+		tok = FLOAT
+		for digitVal(s.ch) < 10 {
+			s.next()
+		}
+		return tok, string(s.src[offs: s.offset])
+	}
 
 	for digitVal(s.ch) < 10 {
 		s.next()
 	}
 	return tok, string(s.src[offs: s.offset])
+
 }
 
 func (s *Scanner) scanString() string {
@@ -153,12 +163,10 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 
 			}
 		}else {
-
 			tok = SYMBOL
-
 		}
 	case '0' <= ch && ch <= '9':
-		tok, lit = s.scanNumber()
+		tok, lit = s.scanNumber(false)
 	default:
 		s.next()
 		switch ch  { // now, ch is a old one
@@ -183,10 +191,6 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 			tok = LBRACE
 		case '}':
 			tok = RBRACE
-		case ',':
-			tok = COMMA
-		case '.':
-			tok = DOT
 		case '$':
 			// special or symbol
 			if isLetter(s.ch) {
@@ -194,7 +198,7 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 				lit = s.scanString()
 				tok = SYMBOL
 			}else if '0' <= s.ch && s.ch <= '9'{
-				tok, lit = s.scanNumber()
+				tok, lit = s.scanNumber(false)
 				tok = SYMBOL
 				lit = "$" + lit
 			}
@@ -208,6 +212,14 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 			tok = DIV
 		case '%':
 			tok = MOD
+		case ',':
+			tok = COMMA
+		case '.':
+			if '0' <= s.ch && s.ch <= '9' {
+				tok, lit = s.scanNumber(true)
+			}else {
+				tok = DOT
+			}
 		default:
 			lit = string(ch)
 		}
