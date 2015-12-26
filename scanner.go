@@ -148,10 +148,11 @@ func (s *Scanner) scanString() string {
 
 	return string(s.src[offs:s.offset])
 }
-func (s *Scanner) Scan() (tok TokenType, lit string) {
+func (s *Scanner) Scan() (pos Pos, tok TokenType, lit string) {
 	//scanAgain:
 	s.skipWhitespace()
 
+	pos = Pos{Offset:s.offset}
 	switch ch := s.ch; {
 	case isLetter(ch):
 		lit = s.scanIdentifier()
@@ -174,12 +175,12 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 			// TERMINATED
 			if s.insertSemi{
 				s.insertSemi = false
-				return SEMICOLON, "\n"
+				return pos, SEMICOLON, "\n"
 			}
 			tok = EOF
 		case '\n':
 			s.insertSemi = false
-			return SEMICOLON, "\n"
+			return pos, SEMICOLON, "\n"
 		case '"':
 			tok = STRING
 			lit = s.scanString()
@@ -220,6 +221,8 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 			}else {
 				tok = DOT
 			}
+		case ';':
+			tok = SEMICOLON
 		default:
 			lit = string(ch)
 		}

@@ -163,7 +163,7 @@ func (t *Tokenizer) Tokenize(src string) (tokens []TokenType, err error) {
 	srcByte := []byte(src)
 	s.Init(srcByte, eh)
 	for {
-		tok, lit := s.Scan()
+		_, tok, lit := s.Scan()
 		if tok == EOF {
 			break;
 		}
