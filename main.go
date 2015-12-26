@@ -58,7 +58,9 @@ func main() {
 			flagAcc = flags[arg[:2]].acc
 			phase = flags[arg[:2]].phase;
 			if flagAcc != nil {
-				flagAcc.Accept(arg[:2])
+				flagAcc.Accept(arg[2:])
+				// phase done
+				phase = PROG_PHASE
 			} else {
 				// no such flag
 				fmt.Println("No such flag as '" + arg[:2] + "'")
@@ -76,6 +78,7 @@ func main() {
 		}
 	}
 	config := NewConfig();
+	config.Delimiter = sFlag.PopString();
 	config.Print()
 	core := NewCore();
 	println("prog: " + prog)

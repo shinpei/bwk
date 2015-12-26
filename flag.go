@@ -3,7 +3,8 @@ package main
 type FlagAcceptor interface {
 	Desc() string
 	Accept(string)
-	PopValue() string
+	// FIXME: cannot fix to string, but interface{} is too much.
+	PopString() string
 }
 
 type DelimiterFlag struct {
@@ -22,11 +23,12 @@ func (s *DelimiterFlag) Desc() string {
 func (s *DelimiterFlag) Accept(arg string) {
 	s.Delimiter = arg
 }
-func (s *DelimiterFlag) PopValue() string {
+func (s *DelimiterFlag) PopString() string {
 	return s.Delimiter
 }
 
 type VarFlag struct {
+	Vars map[string]interface{}
 }
 
 func (s *VarFlag) Desc() string {
@@ -35,7 +37,7 @@ func (s *VarFlag) Desc() string {
 
 func (s *VarFlag) Accept(arg string) {
 }
-func (s *VarFlag) PopValue() string {
+func (s *VarFlag) PopString() string {
 	return ""
 }
 
@@ -48,6 +50,6 @@ func (s *ProgFlag) Desc() string {
 func (s *ProgFlag) Accept(arg string) {
 }
 
-func (s *ProgFlag) PopValue() string {
+func (s *ProgFlag) PopString() string {
 	return ""
 }

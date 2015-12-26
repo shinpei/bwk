@@ -26,7 +26,7 @@ func (node *Node) String() string{
 return ""
 }
 
-func (p *Parser) Parse(tokens *[]TokenType) *Node {
+func (p *Parser) Parse(tokens []TokenType) *Node {
 	node := new(Node)
 	return node
 }

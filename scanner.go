@@ -194,6 +194,16 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 				tok = SYMBOL
 				lit = "$" + lit
 			}
+		case '+':
+			tok = ADD
+		case '-':
+			tok = SUB
+		case '*':
+			tok = MUL
+		case '/':
+			tok = DIV
+		case '%':
+			tok = MOD
 		default:
 			lit = string(ch)
 		}

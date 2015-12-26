@@ -28,8 +28,8 @@ const (
 	ADD // '+'
 	SUB // '-'
 	MUL // '*'
-	QUO // '/'
-	REM // '%'
+	DIV // '/'
+	MOD // '%'
 
 	EQL
 	NEQ
@@ -81,8 +81,8 @@ var tokenDefs = [...]string{
 	ADD: "+",
 	SUB: "-",
 	MUL: "*",
-	QUO: "/",
-	REM: "%",
+	DIV: "/",
+	MOD: "%",
 
 	EQL: "==",
 	NEQ: "!=",
@@ -145,8 +145,8 @@ func Lookup (ident string) TokenType {
 }
 
 
-func (t *Tokenizer) Tokenize(src string) (tokens *[]TokenType, err error) {
-	tokens = new([]TokenType)
+func (t *Tokenizer) Tokenize(src string) (tokens []TokenType, err error) {
+	tokens = make([]TokenType, 0)
 	s := new(Scanner)
 	eh := func (msg string) {
 		fmt.Errorf("Error handler called (msg=%s)", msg)
@@ -159,6 +159,7 @@ func (t *Tokenizer) Tokenize(src string) (tokens *[]TokenType, err error) {
 			break;
 		}
 		fmt.Println("type=",tokenDefs[tok], ":", lit)
+		tokens = append(tokens, tok)
 	}
 	return tokens, nil
 }
