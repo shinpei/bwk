@@ -7,11 +7,20 @@ func TestScan(t *testing.T) {
 		t.Errorf("Error handler called (msg=%s)", msg)
 	}
 
-	source :=[]byte("123  222\n")
+	source :=[]byte("123  symbol \"string\"\n")
 	var s Scanner
 	s.Init(source, eh);
-	for {
-		tok, _ := s.Scan()
-		print (tok)
+	tok, _ := s.Scan()
+	if tok != INT {
+		t.Errorf("expected INT token is not found at 1st place");
 	}
+	tok, _ = s.Scan()
+	if tok != SYMBOL {
+		t.Errorf("expected SYMBOL token is not found at 2nd place")
+	}
+	tok, _ = s.Scan()
+	if tok != STRING {
+		t.Errorf("expected STRING token is not found at 2nd place")
+	}
+
 }

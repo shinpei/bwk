@@ -1,4 +1,5 @@
 package main
+import "fmt"
 
 type Tokenizer struct {
 }
@@ -65,7 +66,7 @@ const (
 
 // better to define errors
 
-var tokens = [...]string{
+var tokenDefs = [...]string{
 	ILLEGAL: "ILLEGAL",
 	EOF:     "EOF",
 	COMMENT: "COMMENT",
@@ -126,7 +127,7 @@ func NewTokenizer() *Tokenizer {
 	tok := new(Tokenizer)
 	keywords = make(map[string]TokenType)
 	for i := keyword_begin + 1; i < keyword_end; i++ {
-		keywords[tokens[i]] = i
+		keywords[tokenDefs[i]] = i
 	}
 	return tok
 }
@@ -140,8 +141,20 @@ func Lookup (ident string) TokenType {
 }
 
 
-func (t *Tokenizer) Tokenize(line string) (tokens *[]TokenType, err error) {
+func (t *Tokenizer) Tokenize(src string) (tokens *[]TokenType, err error) {
 	tokens = new([]TokenType)
-
+	s := new(Scanner)
+	eh := func (msg string) {
+		fmt.Errorf("Error handler called (msg=%s)", msg)
+	}
+	srcByte := []byte(src)
+	s.Init(srcByte, eh)
+	for {
+		tok, lit := s.Scan()
+		if tok == EOF {
+			break;
+		}
+		fmt.Println("type=",tokenDefs[tok], ":", lit)
+	}
 	return tokens, nil
 }

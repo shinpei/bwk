@@ -36,7 +36,6 @@ func (s *Scanner) next() {
 		}
 		s.rdOffset += w
 		s.ch =r
-		println("r=" + string(r))
 	} else{
 		s.offset = len(s.src)
 		if s.ch == '\n'{
@@ -100,7 +99,7 @@ func digitVal(ch rune) int {
 }
 
 
-func (s *Scanner) scanNumber() (tok TokenType, lit string) {
+func (s *Scanner) scanNumber() (tok TokenType,  lit string) {
 
 	offs := s.offset
 	tok = INT// TODO: Parse float
@@ -135,7 +134,7 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 		s.next()
 		switch ch {
 		case -1:
-			println("ch ='" + string(ch) + "'")
+			// NUL
 			if s.insertSemi{
 				s.insertSemi = false
 				return SEMICOLON, "\n"

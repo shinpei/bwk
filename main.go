@@ -48,7 +48,7 @@ func main() {
 		return
 	}
 
-	var phase ArgParsingPhase;
+	var phase ArgParsingPhase = PROG_PHASE
 	var flagAcc FlagAcceptor;
 	var prog string =""
 	for _, arg := range args[1:] {
