@@ -46,6 +46,8 @@ const (
 	COLON // :
 	SEMICOLON // ;
 
+	DOLLAR // $
+
 	// Keywords
 	keyword_begin
 	IF
@@ -93,6 +95,8 @@ var tokenDefs = [...]string{
 
 	COLON: ":",
 	SEMICOLON: ";",
+
+	DOLLAR : "$",
 
 	IF:       "if",
 	WHILE:    "while",

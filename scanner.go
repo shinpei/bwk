@@ -109,6 +109,30 @@ func (s *Scanner) scanNumber() (tok TokenType,  lit string) {
 	}
 	return tok, string(s.src[offs: s.offset])
 }
+
+func (s *Scanner) scanString() string {
+	// '"' opening already consumed
+	offs := s.offset - 1
+
+	for {
+		ch := s.ch
+		if ch == '\n' || ch < 0 {
+			s.error(offs, "string literal not terminated")
+			break
+		}
+		s.next()
+		if ch == '"' {
+			break
+		}
+		/*
+		if ch == '\\' {
+			s.scanEscape('"')
+		}
+		*/
+	}
+
+	return string(s.src[offs:s.offset])
+}
 func (s *Scanner) Scan() (tok TokenType, lit string) {
 	//scanAgain:
 	s.skipWhitespace()
@@ -132,9 +156,9 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 		tok, lit = s.scanNumber()
 	default:
 		s.next()
-		switch ch {
+		switch ch  { // now, ch is a old one
 		case -1:
-			// NUL
+			// TERMINATED
 			if s.insertSemi{
 				s.insertSemi = false
 				return SEMICOLON, "\n"
@@ -143,6 +167,28 @@ func (s *Scanner) Scan() (tok TokenType, lit string) {
 		case '\n':
 			s.insertSemi = false
 			return SEMICOLON, "\n"
+		case '"':
+			tok = STRING
+			lit = s.scanString()
+		case '(':
+			tok = LPAREN
+		case ')'  :
+			tok = RPAREN
+		case '{' :
+			tok = LBRACE
+		case '}':
+			tok = RBRACE
+		case '$':
+			// special or symbol
+			if isLetter(s.ch) {
+				//
+				lit = s.scanString()
+				tok = SYMBOL
+			}else if '0' <= s.ch && s.ch <= '9'{
+				tok, lit = s.scanNumber()
+				tok = SYMBOL
+				lit = "$" + lit
+			}
 		default:
 			lit = string(ch)
 		}
