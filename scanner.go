@@ -1,7 +1,12 @@
+// Scanner for bwk.
+// A lot inspired from go/scanner
+
 package main
 import (
 	"unicode"
 )
+
+
 
 type Scanner struct {
 	src []byte
