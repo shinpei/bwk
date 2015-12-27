@@ -215,6 +215,8 @@ func (s *Scanner) Scan() (pos Pos, tok TokenType, lit string) {
 			tok = MOD
 		case ',':
 			tok = COMMA
+		case '=':
+			tok =  ASSIGN
 		case '.':
 			if '0' <= s.ch && s.ch <= '9' {
 				tok, lit = s.scanNumber(true)

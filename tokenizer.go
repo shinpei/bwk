@@ -33,6 +33,7 @@ const (
 
 	EQL
 	NEQ
+	ASSIGN
 
 	operator_end
 
@@ -89,6 +90,7 @@ var tokenDefs = [...]string{
 
 	EQL: "==",
 	NEQ: "!=",
+	ASSIGN: "=",
 
 	LPAREN: "(",
 	LBRACE: "{",

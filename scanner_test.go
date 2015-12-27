@@ -11,25 +11,43 @@ var (
 	}
 )
 
+func expect(t *testing.T, s Scanner, epos Pos, etk TokenType, elit string){
+	pos,tok,lit := s.Scan()
+	if tok != etk {
+		t.Errorf("Expected %v token, but %v", etk.String(), tok.String())
+	}
+	if pos != epos {
+		t.Errorf("Expected %v pos, but %v", epos.Offset, pos.Offset)
+	}
+	if lit != elit {
+		t.Errorf("Expected '%s' lit , but '%s'", elit, lit)
+	}
+
+
+}
+
 func TestScanInt(t *testing.T) {
 	source := []byte("123 ")
 	var s Scanner
 	s.Init(source, eh)
-	_,tok, _ := s.Scan()
-	if tok != INT {
-		t.Errorf("expected INT token is not found at 1st place")
-	}
+	expect(t, s, Pos{Offset:0}, INT, "123")
+}
+
+func TestScanInts(t *testing.T) {
+	src := []byte("123, 456")
+	var s Scanner
+	s.Init(src, eh)
+	expect(t, s, Pos{Offset:0}, INT, "123")
+	expect(t, s, Pos{Offset:4}, COMMA, "")
 }
 
 func TestScanFloatWithoutLeadingZero(t *testing.T) {
 	source := []byte(".3")
 	var s Scanner
 	s.Init(source, eh)
-	_,tok, _ := s.Scan()
-	if tok != FLOAT {
-		t.Errorf("expected FLOAT token is not found at 1st place")
-	}
+	expect(t, s, Pos{Offset:0}, FLOAT, ".3")
 }
+
 func TestScanFloat(t *testing.T) {
 	source := []byte(".3")
 	var s Scanner

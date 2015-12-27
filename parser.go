@@ -46,7 +46,10 @@ func (p *Parser) parseStmt() (s Stmt) {
 	switch p.tok {
 	case SYMBOL, INT, FLOAT, STRING, LPAREN,
 		ADD,SUB,MUL,DIV:
+//		pos, tok := p.pos, p.tok
+		p.next()
 		//s, _ = p.parseSimpleStmt()
+
 	}
 	return s
 }
