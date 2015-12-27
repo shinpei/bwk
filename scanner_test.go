@@ -16,14 +16,12 @@ func expect(t *testing.T, s Scanner, epos Pos, etk TokenType, elit string){
 	if tok != etk {
 		t.Errorf("Expected %v token, but %v", etk.String(), tok.String())
 	}
-	if pos != epos {
+	if pos.Offset != epos.Offset {
 		t.Errorf("Expected %v pos, but %v", epos.Offset, pos.Offset)
 	}
 	if lit != elit {
 		t.Errorf("Expected '%s' lit , but '%s'", elit, lit)
 	}
-
-
 }
 
 func TestScanInt(t *testing.T) {
@@ -48,47 +46,20 @@ func TestScanFloatWithoutLeadingZero(t *testing.T) {
 	expect(t, s, Pos{Offset:0}, FLOAT, ".3")
 }
 
-func TestScanFloat(t *testing.T) {
-	source := []byte(".3")
-	var s Scanner
-	s.Init(source, eh)
-	_,tok, _ := s.Scan()
-	if tok != FLOAT {
-		t.Errorf("expected FLOAT token is not found at 1st place")
-	}
-}
-
 func TestScanSymbol(t *testing.T) {
 	source := []byte("symbol")
 	var s Scanner
 	s.Init(source, eh)
-	_, tok, _ := s.Scan()
-	if tok != SYMBOL {
-		t.Errorf("expected SYMBOL token is not found at 2nd place")
-	}
-}
+	expect(t, s, Pos{Offset:0}, SYMBOL, "symbol")
 
-func TestScanDollarSymbol(t *testing.T) {
-	source := []byte("$alsoSymbol")
-	var s Scanner
-	s.Init(source, eh)
-	_, tok, _ := s.Scan()
-	if tok != SYMBOL {
-		t.Errorf("expected SYMBOL token is not found at 2nd place")
-	}
 }
 
 func TestScanSpecialSymbol(t *testing.T) {
 	source := []byte("$1")
 	var s Scanner
 	s.Init(source, eh)
-	_,tok, lit := s.Scan()
-	if tok != SYMBOL {
-		t.Errorf("expected SYMBOL token is not found at 2nd place")
-	}
-	if lit != "$1" {
-		t.Errorf("expected SYMBOL literal is $1 but '" + lit + "'")
-	}
+	expect(t, s, Pos{Offset:0}, SYMBOL, "$1")
+
 }
 
 
@@ -96,10 +67,8 @@ func TestScanString(t *testing.T) {
 	source := []byte("\"string\"")
 	var s Scanner
 	s.Init(source, eh)
-	_,tok, _ := s.Scan()
-	if tok != STRING {
-		t.Errorf("expected STRING token is not found at 2nd place")
-	}
+	expect(t, s, Pos{Offset:0}, STRING, "\"string\"")
+
 }
 
 func TestScanKeywordExit(t *testing.T) {
