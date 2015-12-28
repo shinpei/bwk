@@ -1,5 +1,6 @@
 package main
 import (
+	"fmt"
 )
 
 type Parser struct {
@@ -48,7 +49,6 @@ func (p *Parser) parseStmt() (s Stmt) {
 		ADD,SUB,MUL,DIV:
 //		pos, tok := p.pos, p.tok
 		p.next()
-		//s, _ = p.parseSimpleStmt()
 
 	}
 	return s
@@ -57,6 +57,7 @@ func (p *Parser) parseStmt() (s Stmt) {
 func (p *Parser) parseStmtList()(list []Stmt) {
 	for p.tok != RBRACE && p.tok != EOF {
 		list = append(list, p.parseStmt())
+		fmt.Println("processing")
 	}
 	return
 }
@@ -72,9 +73,8 @@ func (p *Parser) parseBody(/*scope Scope */) *BlockStmt{
 	}
 }
 
-// it's like parseFuncDecl
-// no global scope var defs
-func (p *Parser) parseDecl () Decl {
+
+func (p *Parser) parseFuncDecl () Decl {
 
 
 /*	if p.tok == LPAREN {
@@ -84,15 +84,21 @@ func (p *Parser) parseDecl () Decl {
 	*/
 
 	var body *BlockStmt
-	if p.tok == LBRACE {
-		body = p.parseBody(/*scope*/)
-	}
+	//if p.tok == LBRACE {
+	body = p.parseBody(/*scope*/)
+	//}
 	//p.expectSemi()
 
 	decl := &FuncDecl {
 		Body: body,
 	}
 	return   decl
+}
+
+
+func (p *Parser ) parseDecl() Decl {
+	return p.parseFuncDecl()
+
 }
 
 func (p *Parser) Parse() *ParsedThing{
