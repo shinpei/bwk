@@ -83,6 +83,6 @@ func main() {
 	config.Print()
 	core := NewCore();
 	println("prog: '" + prog + "'")
-	core.Exec(config, prog);
+	core.EvaluateString(config, prog);
 
 }

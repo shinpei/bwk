@@ -101,7 +101,7 @@ func (p *Parser ) parseDecl() Decl {
 
 }
 
-func (p *Parser) Parse() *ParsedThing{
+func (p *Parser) Parse() (pt *ParsedThing, err error) {
 
 	var decls []Decl
 	for p.tok != EOF {
@@ -110,7 +110,7 @@ func (p *Parser) Parse() *ParsedThing{
 
 	return &ParsedThing {
 		Decls: decls,
-	}
+	}, nil
 }
 
 func (p *Parser) Init(src []byte) {

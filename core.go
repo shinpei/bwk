@@ -1,4 +1,5 @@
 package main
+import "fmt"
 
 type Core struct{
 	tok *Tokenizer
@@ -10,11 +11,25 @@ func NewCore () *Core {
 	return core;
 }
 
-func (c *Core) Exec(config *Config, prog string) (err error) {
+func (c *Core) exec(codes []Code)    {
+
+}
+func (c *Core) compile(ps *ParsedThing) (codes []Code,err error) {
+
+	return
+}
+
+func (c *Core) EvaluateString(config *Config, prog string) (err error) {
 	var parser Parser
 	src := []byte(prog);
 
 	parser.Init(src);
-	_ = parser.Parse()
+	ps, err := parser.Parse()
+	if err != nil {
+		fmt.Errorf("Parsing error", err)
+	}
+	code, _ :=c.compile(ps)
+	c.exec(code)
+
 	return nil
 }
