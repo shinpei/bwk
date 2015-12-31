@@ -22,9 +22,9 @@ func NewStack(size int) *Stack{
 func (s *Stack) Push(v Value) {
 	//FIXME: append is a bad way to expand stack
 	s.values = append(s.values, v)
-	s.sp ++
-
+	s.sp++
 }
+
 func (s *Stack) Pop() Value{
 	val := s.values[s.sp]
 	s.sp--
@@ -52,10 +52,23 @@ type Code interface{
 // addi 1
 //
 type (
-	Addi struct { x int}
 	Pushi struct {x int}
 	Popi struct {x int}
+	Addi struct { x int}
+	Subi struct {x int}
+	Muli struct {x int}
+	Divi struct {x int}
 )
+
+func (c *Pushi) Step (e *Environment) {
+	// push x to the stack
+	e.stack.Push(&IValue{Val: c.x})
+}
+
+func (c *Popi) Step (e *Environment) {
+	// push x to the stack
+	e.stack.Pop()
+}
 
 func (c *Addi) Step (e *Environment) {
 	// add integer to the stack
@@ -67,12 +80,32 @@ func (c *Addi) Step (e *Environment) {
 	e.stack.Push(ival)
 }
 
-func (c *Pushi) Step (e *Environment) {
-	// push x to the stack
-	e.stack.Push(&IValue{Val: c.x})
-}
-func (c *Popi) Step (e *Environment) {
-	// push x to the stack
-	e.stack.Pop()
+func (c *Subi) Step (e *Environment) {
+	// add integer to the stack
+	v := e.stack.Pop()
+	ival, ok := v.(*IValue)
+	if ok {
+		ival.Set(ival.Get() - c.x)
+	}
+	e.stack.Push(ival)
 }
 
+func (c *Muli) Step (e *Environment) {
+	// add integer to the stack
+	v := e.stack.Pop()
+	ival, ok := v.(*IValue)
+	if ok {
+		ival.Set(ival.Get() * c.x)
+	}
+	e.stack.Push(ival)
+}
+func (c *Divi) Step (e *Environment) {
+	// add integer to the stack
+	v := e.stack.Pop()
+	ival, ok := v.(*IValue)
+	if ok {
+		// TODO: c.x shouldn't be 0
+		ival.Set(ival.Get() / c.x)
+	}
+	e.stack.Push(ival)
+}

@@ -14,6 +14,8 @@ func NewCore () *Core {
 func (c *Core) exec(codes []Code)    {
 
 }
+
+
 func (c *Core) compile(ps *ParsedThing) (codes []Code,err error) {
 
 	return
