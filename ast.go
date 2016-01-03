@@ -27,10 +27,20 @@ type (
 		From, To Pos
 	}
 
+	BasicLit struct {
+		ValuePos Pos
+		Kind TokenType
+		Value string // literal string; e.g. 42, 1.2
+	}
 	SymbolExpr struct {
 		NamePos Pos
 		Name string
 		// Object
+	}
+	UnaryExpr struct {
+		OpPos Pos
+		Op TokenType
+		X Expr
 	}
 	BinaryExpr struct {
 		X Expr
@@ -42,12 +52,22 @@ type (
 )
 
 func (x *BadExpr) Pos() Pos { return x.From}
+func (x *BasicLit) Pos () Pos {return x.ValuePos}
 func (x *SymbolExpr) Pos () Pos {return x.NamePos}
+func (x *UnaryExpr) Pos() Pos      { return x.OpPos }
 func (x *BinaryExpr) Pos () Pos {return x.X.Pos()}
 
 func (x *BadExpr) End() Pos { return x.To}
+func (x *BasicLit) End() Pos { return Pos{Offset:(x.ValuePos.Offset + len(x.Value))} }
 func (x *SymbolExpr) End() Pos { return Pos{Offset:(x.NamePos.Offset + len(x.Name))}}
+func (x *UnaryExpr) End() Pos      { return x.X.End() }
 func (x *BinaryExpr) End() Pos { return x.Y.End()}
+
+func (x *BadExpr) exprNode() {}
+func (x *BasicLit) exprNode() {}
+func (x *SymbolExpr) exprNode() {}
+func (x *UnaryExpr) exprNode() {}
+func (x *BinaryExpr) exprNode() {}
 
 //Stmts
 type (

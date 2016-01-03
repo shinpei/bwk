@@ -1,6 +1,7 @@
 package main
 import (
 	"fmt"
+	"strconv"
 )
 
 type Parser struct {
@@ -9,6 +10,7 @@ type Parser struct {
 	tok TokenType
 	pos Pos
 	lit string
+	inRhs bool
 }
 type NodeType int
 
@@ -37,21 +39,106 @@ func (p *Parser) expect(tok TokenType) Pos {
 	p.next()
 	return pos
 }
+func (p *Parser) parseOperand(lhs bool) Expr {
+	switch p.tok {
+	case INT, FLOAT, STRING:
+		x := &BasicLit{ValuePos: p.pos, Kind: p.tok, Value: p.lit}
+		p.next()
+		return x
+	}
+	return &BadExpr{}
+}
 
-/*
-func (p *Parser) parseSimpleStmt() (Stmt, bool) {
+func (p *Parser) parsePrimaryExpr(lhs bool) Expr {
+	x := p.parseOperand(lhs)
+
+	return x;
+}
+
+
+func (p *Parser) parseUnaryExpr(lhs bool) Expr {
+
+	switch p.tok{
+	case ADD, MUL, SUB, DIV:
+		pos, op := p.pos, p.tok;
+		p.next()
+		x := p.parseUnaryExpr(false)
+		return &UnaryExpr{OpPos: pos, Op: op, X:x}
+
+	}
+	return p.parsePrimaryExpr(lhs)
+}
+
+func (p *Parser) parseBinaryExpr(lhs bool) Expr {
+	x := p.parseUnaryExpr(lhs)
+	for {
+		pos := p.pos
+		tok := p.tok
+		p.next()
+		if lhs {
+			//TODO: Resolve symbol...?
+			//p.resolve(x)
+			lhs = false
+		}
+		y := p.parseBinaryExpr(false)
+		x = &BinaryExpr{X: x, OpPos : pos, Op: tok, Y:y}
+
+	}
+	return x
+}
+
+func (p *Parser) parseExpr (lhs bool) Expr {
+	return p.parseBinaryExpr(lhs)
+}
+
+func (p *Parser) parseExprList(lhs bool)(list []Expr) {
+	list = append(list, p.parseExpr(lhs))
+	for p.tok == COMMA {
+		p.next()
+		list = append(list, p.parseExpr(lhs))
+		println("HI")
+	}
+
+
 	return
-} */
+}
+
+func (p *Parser) parseLhsList()[]Expr {
+	old := p.inRhs
+	p.inRhs = false
+	list := p.parseExprList(true)
+	switch p.tok {
+	default:
+		//for _,  := range list {
+			//p.resolve(x) //TODO!
+		//}
+	}
+	p.inRhs = old
+	return list
+}
+
+func (p *Parser) parseSimpleStmt() (Stmt, bool) {
+	x := p.parseLhsList()
+
+
+	return &ExprStmt{X: x[0]}, false
+}
 
 func (p *Parser) parseStmt() (s Stmt) {
 	switch p.tok {
-	case SYMBOL, INT, FLOAT, STRING, LPAREN,
-		ADD,SUB,MUL,DIV:
-//		pos, tok := p.pos, p.tok
+	case SYMBOL, INT, FLOAT, STRING,
+		ADD,SUB,MUL,DIV,LPAREN:
+		s, _ = p.parseSimpleStmt()
+
+	case SEMICOLON:
+		s = &EmptyStmt{Semicolon:p.pos}
 		p.next()
+	default:
+		pos := p.pos
+		println("Bad Stmt! at pos=" + strconv.Itoa(pos.Offset));
 
 	}
-	return s
+	return
 }
 
 func (p *Parser) parseStmtList()(list []Stmt) {
