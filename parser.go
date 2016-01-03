@@ -71,19 +71,27 @@ func (p *Parser) parseUnaryExpr(lhs bool) Expr {
 
 func (p *Parser) parseBinaryExpr(lhs bool) Expr {
 	x := p.parseUnaryExpr(lhs)
-	for {
-		pos := p.pos
-		tok := p.tok
-		p.next()
-		if lhs {
-			//TODO: Resolve symbol...?
-			//p.resolve(x)
-			lhs = false
-		}
-		y := p.parseBinaryExpr(false)
-		x = &BinaryExpr{X: x, OpPos : pos, Op: tok, Y:y}
-
+	//for {
+	pos := p.pos
+	tok := p.tok
+	p.next()
+	if lhs {
+		//TODO: Resolve symbol...?
+		//p.resolve(x)
+		lhs = false
 	}
+	if xx, ok := x.(*BasicLit); ok {
+		println("x =", xx.Value)
+	}
+
+	if (lhs) {
+		y := p.parseBinaryExpr(false)
+		if yy, ok := x.(*BinaryExpr); ok {
+			println("yy=",yy)
+		}
+		x = &BinaryExpr{X: x, OpPos : pos, Op: tok, Y:y}
+	}
+
 	return x
 }
 
@@ -143,9 +151,11 @@ func (p *Parser) parseStmt() (s Stmt) {
 
 func (p *Parser) parseStmtList()(list []Stmt) {
 	for p.tok != RBRACE && p.tok != EOF {
+		fmt.Println("processing:", p.tok.String())
 		list = append(list, p.parseStmt())
-		fmt.Println("processing")
+
 	}
+	fmt.Println("Terminated Stmtlist", p.tok.String())
 	return
 }
 func (p *Parser) parseBody(/*scope Scope */) *BlockStmt{

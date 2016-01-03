@@ -2,6 +2,8 @@ package main
 import "testing"
 
 func TestParsing (t *testing.T) {
-	p := new(Parser)
-	println(p)
+	var parser Parser
+	src := []byte("{5+4}")
+	parser.Init(src)
+	parser.Parse()
 }

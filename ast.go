@@ -32,11 +32,13 @@ type (
 		Kind TokenType
 		Value string // literal string; e.g. 42, 1.2
 	}
+
 	SymbolExpr struct {
 		NamePos Pos
 		Name string
 		// Object
 	}
+
 	UnaryExpr struct {
 		OpPos Pos
 		Op TokenType

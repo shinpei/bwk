@@ -229,6 +229,6 @@ func (s *Scanner) Scan() (pos Pos, tok TokenType, lit string) {
 			lit = string(ch)
 		}
 	}
-
+	//println("[Tokenizer]", tok.String())
 	return
 }
