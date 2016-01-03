@@ -1,15 +1,15 @@
 package main
+
 import (
-	"fmt"
 	"strconv"
 )
 
 type Parser struct {
 	scanner Scanner
 
-	tok TokenType
-	pos Pos
-	lit string
+	tok   TokenType
+	pos   Pos
+	lit   string
 	inRhs bool
 }
 type NodeType int
@@ -27,14 +27,14 @@ type ParsedThing struct {
 	Decls []Decl
 }
 
-func (p *Parser) error (msg string) {
+func (p *Parser) error(msg string) {
 	panic(msg) // TODO: more smarter way is required.
 }
 
 func (p *Parser) expect(tok TokenType) Pos {
 	pos := p.pos
 	if p.tok != tok {
-		p.error(tok.String() + " is expected but we got "+ p.tok.String())
+		p.error(tok.String() + " is expected but we got " + p.tok.String())
 	}
 	p.next()
 	return pos
@@ -52,18 +52,17 @@ func (p *Parser) parseOperand(lhs bool) Expr {
 func (p *Parser) parsePrimaryExpr(lhs bool) Expr {
 	x := p.parseOperand(lhs)
 
-	return x;
+	return x
 }
-
 
 func (p *Parser) parseUnaryExpr(lhs bool) Expr {
 
-	switch p.tok{
+	switch p.tok {
 	case ADD, MUL, SUB, DIV:
-		pos, op := p.pos, p.tok;
+		pos, op := p.pos, p.tok
 		p.next()
 		x := p.parseUnaryExpr(false)
-		return &UnaryExpr{OpPos: pos, Op: op, X:x}
+		return &UnaryExpr{OpPos: pos, Op: op, X: x}
 
 	}
 	return p.parsePrimaryExpr(lhs)
@@ -71,54 +70,46 @@ func (p *Parser) parseUnaryExpr(lhs bool) Expr {
 
 func (p *Parser) parseBinaryExpr(lhs bool) Expr {
 	x := p.parseUnaryExpr(lhs)
-	//for {
-	pos := p.pos
-	tok := p.tok
-	p.next()
-	if lhs {
-		//TODO: Resolve symbol...?
-		//p.resolve(x)
-		lhs = false
-	}
 	if xx, ok := x.(*BasicLit); ok {
-		println("x =", xx.Value)
+		D("x =", xx.Value)
 	}
 
-	if (lhs) {
+	if lhs {
+		pos := p.pos
+		tok := p.tok
+		p.next()
 		y := p.parseBinaryExpr(false)
 		if yy, ok := x.(*BinaryExpr); ok {
-			println("yy=",yy)
+			D("yy=", yy)
 		}
-		x = &BinaryExpr{X: x, OpPos : pos, Op: tok, Y:y}
+		x = &BinaryExpr{X: x, OpPos: pos, Op: tok, Y: y}
 	}
 
 	return x
 }
 
-func (p *Parser) parseExpr (lhs bool) Expr {
+func (p *Parser) parseExpr(lhs bool) Expr {
 	return p.parseBinaryExpr(lhs)
 }
 
-func (p *Parser) parseExprList(lhs bool)(list []Expr) {
+func (p *Parser) parseExprList(lhs bool) (list []Expr) {
 	list = append(list, p.parseExpr(lhs))
+	D("List size=", len(list), ", and tok=", p.tok.String())
 	for p.tok == COMMA {
 		p.next()
 		list = append(list, p.parseExpr(lhs))
-		println("HI")
 	}
-
-
 	return
 }
 
-func (p *Parser) parseLhsList()[]Expr {
+func (p *Parser) parseLhsList() []Expr {
 	old := p.inRhs
 	p.inRhs = false
 	list := p.parseExprList(true)
 	switch p.tok {
 	default:
 		//for _,  := range list {
-			//p.resolve(x) //TODO!
+		//p.resolve(x) //TODO!
 		//}
 	}
 	p.inRhs = old
@@ -127,73 +118,68 @@ func (p *Parser) parseLhsList()[]Expr {
 
 func (p *Parser) parseSimpleStmt() (Stmt, bool) {
 	x := p.parseLhsList()
-
-
+	D("Lhs has been parsed, cur=", p.tok.String())
 	return &ExprStmt{X: x[0]}, false
 }
 
 func (p *Parser) parseStmt() (s Stmt) {
 	switch p.tok {
 	case SYMBOL, INT, FLOAT, STRING,
-		ADD,SUB,MUL,DIV,LPAREN:
+		ADD, SUB, MUL, DIV, LPAREN:
 		s, _ = p.parseSimpleStmt()
-
+		D("at parseStmt: ", p.tok.String())
 	case SEMICOLON:
-		s = &EmptyStmt{Semicolon:p.pos}
+		s = &EmptyStmt{Semicolon: p.pos}
 		p.next()
 	default:
 		pos := p.pos
-		println("Bad Stmt! at pos=" + strconv.Itoa(pos.Offset));
-
+		D("Bad Stmt! at pos=" + strconv.Itoa(pos.Offset))
 	}
 	return
 }
 
-func (p *Parser) parseStmtList()(list []Stmt) {
+func (p *Parser) parseStmtList() (list []Stmt) {
 	for p.tok != RBRACE && p.tok != EOF {
-		fmt.Println("processing:", p.tok.String())
+		D("processing:", p.tok.String())
 		list = append(list, p.parseStmt())
 
 	}
-	fmt.Println("Terminated Stmtlist", p.tok.String())
+	D("Terminated Stmtlist", p.tok.String())
 	return
 }
-func (p *Parser) parseBody(/*scope Scope */) *BlockStmt{
-	lbrace:=p.expect(LBRACE)
+func (p *Parser) parseBody( /*scope Scope */ ) *BlockStmt {
+	lbrace := p.expect(LBRACE)
 	list := p.parseStmtList()
 	rbrace := p.expect(RBRACE)
 
 	return &BlockStmt{
 		Lbrace: lbrace,
-		List: list,
-		Rbrace : rbrace,
+		List:   list,
+		Rbrace: rbrace,
 	}
 }
 
+func (p *Parser) parseFuncDecl() Decl {
 
-func (p *Parser) parseFuncDecl () Decl {
+	/*	if p.tok == LPAREN {
+			//
 
-
-/*	if p.tok == LPAREN {
-		//
-
-	}
+		}
 	*/
 
 	var body *BlockStmt
 	//if p.tok == LBRACE {
-	body = p.parseBody(/*scope*/)
+	body = p.parseBody( /*scope*/ )
 	//}
 	//p.expectSemi()
 
-	decl := &FuncDecl {
+	decl := &FuncDecl{
 		Body: body,
 	}
-	return   decl
+	return decl
 }
 
-
-func (p *Parser ) parseDecl() Decl {
+func (p *Parser) parseDecl() Decl {
 	return p.parseFuncDecl()
 
 }
@@ -205,13 +191,13 @@ func (p *Parser) Parse() (pt *ParsedThing, err error) {
 		decls = append(decls, p.parseDecl())
 	}
 
-	return &ParsedThing {
+	return &ParsedThing{
 		Decls: decls,
 	}, nil
 }
 
 func (p *Parser) Init(src []byte) {
-	eh :=func(msg string) {//p.errors.Add(msg)
+	eh := func(msg string) { //p.errors.Add(msg)
 		// TODO
 		println(msg)
 	}
