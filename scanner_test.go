@@ -25,7 +25,7 @@ func expect(t *testing.T, s Scanner, epos Pos, etk TokenType, elit string){
 }
 
 func TestScanInt(t *testing.T) {
-	source := []byte("123 ")
+	source := []byte("123")
 	var s Scanner
 	s.Init(source, eh)
 	expect(t, s, Pos{Offset:0}, INT, "123")
@@ -71,6 +71,25 @@ func TestScanString(t *testing.T) {
 
 }
 
+func TestScanAssign (t *testing.T) {
+	source := []byte("x=1+3")
+	var s Scanner
+	s.Init(source, eh)
+	_, tok, _ := s.Scan()
+	if tok != SYMBOL {
+		t.Errorf("sould be symbol, but it's ", tok.String())
+	}
+	_, tok, _ = s.Scan()
+	if tok != ASSIGN {
+		t.Errorf("sould be assign, but it's ", tok.String())
+	}
+	_, tok, _ = s.Scan()
+	if tok != INT {
+		t.Errorf("sould be integer, but it's ", tok.String())
+	}
+
+
+}
 func TestScanKeywordExit(t *testing.T) {
 	src := []byte("exit \"exit\"");
 	var s Scanner

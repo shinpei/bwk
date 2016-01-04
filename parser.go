@@ -117,9 +117,13 @@ func (p *Parser) parseLhsList() []Expr {
 }
 
 func (p *Parser) parseSimpleStmt() (Stmt, bool) {
-	x := p.parseLhsList()
+	lhs := p.parseLhsList()
 	D("Lhs has been parsed, cur=", p.tok.String())
-	return &ExprStmt{X: x[0]}, false
+	if len(lhs) > 1 {
+		p.error("Lhs should be length=1, but"+ strconv.Itoa(len(lhs)))
+
+	}
+	return &ExprStmt{X: lhs[0]}, false
 }
 
 func (p *Parser) parseStmt() (s Stmt) {

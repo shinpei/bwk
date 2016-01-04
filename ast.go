@@ -79,12 +79,15 @@ type (
 	DeclStmt struct {
 		Decl Decl
 	}
+
 	EmptyStmt struct {
 		Semicolon Pos
 	}
+
 	ExprStmt struct {
 		X Expr
 	}
+
 	AssignStmt struct {
 		Lhs []Expr
 		TokPos Pos
@@ -138,7 +141,7 @@ type (
 )
 
 func (d *FuncDecl) Pos() Pos { var pos Pos; return pos }
-func (*FuncDecl) End() Pos { var pos Pos; return pos}
-func (*FuncDecl) declNode() {}
+func (d *FuncDecl) End() Pos { var pos Pos; return pos}
+func (d *FuncDecl) declNode() {}
 
 
