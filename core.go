@@ -21,13 +21,13 @@ func (c *Core) exec(codes []Code, env *Environment) Value{
 
 
 func (c *Core) compile(ps *ParsedThing) (codes []Code,err error) {
-
+	gen := new(ExprStmtGen)
 	for _, decl := range ps.Decls {
 		if funcDecl, ok := decl.(*FuncDecl); ok {
 			for _, stmt := range funcDecl.Body.List {
 				if exprStmt, ok := stmt.(*ExprStmt); ok {
-					gen := new(ExprStmtGen)
-					codes = gen.stmtGen(exprStmt)
+					stmtCodes := gen.stmtGen(exprStmt)
+					codes = append(codes, stmtCodes...)
 				}
 			}
 		}

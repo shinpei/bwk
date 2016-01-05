@@ -12,6 +12,7 @@ type Parser struct {
 	lit   string
 	inRhs bool
 }
+
 type NodeType int
 
 const (
@@ -39,6 +40,7 @@ func (p *Parser) expect(tok TokenType) Pos {
 	p.next()
 	return pos
 }
+
 func (p *Parser) parseOperand(lhs bool) Expr {
 	switch p.tok {
 	case INT, FLOAT, STRING:
@@ -151,6 +153,7 @@ func (p *Parser) parseStmtList() (list []Stmt) {
 	D("Terminated Stmtlist", p.tok.String())
 	return
 }
+
 func (p *Parser) parseBody( /*scope Scope */ ) *BlockStmt {
 	lbrace := p.expect(LBRACE)
 	list := p.parseStmtList()

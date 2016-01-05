@@ -44,6 +44,7 @@ type (
 		Op TokenType
 		X Expr
 	}
+
 	BinaryExpr struct {
 		X Expr
 		OpPos Pos

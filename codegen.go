@@ -30,7 +30,7 @@ func (e *ExprStmtGen) stmtGen(stmt *ExprStmt) []Code  {
 				//TODO: type check
 				val, _ := strconv.Atoi(y.Value)
 				codes = append(codes, &Addi{x:val})
-			default:
+			case *BinaryExpr:
 				D("ERROR!!")
 			}
 		default:
