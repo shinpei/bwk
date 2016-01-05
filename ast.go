@@ -127,6 +127,7 @@ func (s *ExprStmt) stmtNode () {}
 func (s *AssignStmt) stmtNode() {}
 func (s *BlockStmt) stmtNode() {}
 
+
 type (
 	Symbol struct {
 		NamePos Pos

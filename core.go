@@ -11,8 +11,12 @@ func NewCore () *Core {
 	return core;
 }
 
-func (c *Core) exec(codes []Code)    {
+func (c *Core) exec(codes []Code, env *Environment) Value{
+	for _, code := range codes {
+		code.Step(env)
+	}
 
+	return env.stack.Pop()
 }
 
 
@@ -22,9 +26,8 @@ func (c *Core) compile(ps *ParsedThing) (codes []Code,err error) {
 		if funcDecl, ok := decl.(*FuncDecl); ok {
 			for _, stmt := range funcDecl.Body.List {
 				if exprStmt, ok := stmt.(*ExprStmt); ok {
-					if anotherStmt, ok := exprStmt.X.(*BinaryExpr); ok {
-						D("BinExpr:", anotherStmt.Op.String())
-					}
+					gen := new(ExprStmtGen)
+					codes = gen.stmtGen(exprStmt)
 				}
 			}
 		}
@@ -41,8 +44,10 @@ func (c *Core) EvaluateString(config *Config, prog string) (err error) {
 	if err != nil {
 		fmt.Errorf("Parsing error", err)
 	}
-	code, _ :=c.compile(ps)
-	c.exec(code)
-
+	codes, _ :=c.compile(ps)
+	D(codes)
+	env := NewEnvironment()
+	v := c.exec(codes, env)
+	D(v.String())
 	return nil
 }
