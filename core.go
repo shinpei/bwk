@@ -45,9 +45,8 @@ func (c *Core) EvaluateString(config *Config, prog string) (err error) {
 		fmt.Errorf("Parsing error", err)
 	}
 	codes, _ :=c.compile(ps)
-	D(codes)
 	env := NewEnvironment()
 	v := c.exec(codes, env)
-	D(v.String())
+	fmt.Println(v.String())
 	return nil
 }

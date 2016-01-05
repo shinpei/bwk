@@ -24,6 +24,15 @@ func (e *ExprStmtGen) stmtGen(stmt *ExprStmt) []Code  {
 			default:
 				D("ERROR!!!")
 			}
+			// check y is int or node
+			switch y := t.Y.(type) {
+			case *BasicLit:
+				//TODO: type check
+				val, _ := strconv.Atoi(y.Value)
+				codes = append(codes, &Addi{x:val})
+			default:
+				D("ERROR!!")
+			}
 		default:
 			D("HI")
 		}
