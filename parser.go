@@ -70,31 +70,42 @@ func (p *Parser) parseUnaryExpr(lhs bool) Expr {
 	return p.parsePrimaryExpr(lhs)
 }
 
-func (p *Parser) parseBinaryExpr(lhs bool) Expr {
-	x := p.parseUnaryExpr(lhs)
-	if xx, ok := x.(*BasicLit); ok {
-		D("x =", xx.Value)
+func (p *Parser) tokPrec() (TokenType, int) {
+	tok := p.tok
+	if p.inRhs && tok == ASSIGN {
+		tok = EQL
 	}
+	return tok, tok.Precedence()
+}
 
-	if lhs {
-		pos := p.pos
-		tok := p.tok
-		p.next()
-		y := p.parseBinaryExpr(false)
-		if yy, ok := x.(*BinaryExpr); ok {
-			D("yy=", yy)
+func (p *Parser) parseBinaryExpr(lhs bool, prec1 int) Expr {
+	x := p.parseUnaryExpr(lhs)
+
+	for _, prec := p.tokPrec(); prec >= prec1; prec-- {
+		for {
+			op, oprec := p.tokPrec()
+			if oprec != prec {
+				break
+			}
+			pos := p.expect(op)
+			if lhs {
+				lhs = false
+			}
+
+			y := p.parseBinaryExpr(false, prec+1)
+			x = &BinaryExpr{X: x, OpPos: pos, Op: op, Y: y}
 		}
-		x = &BinaryExpr{X: x, OpPos: pos, Op: tok, Y: y}
 	}
 
 	return x
 }
 
 func (p *Parser) parseExpr(lhs bool) Expr {
-	return p.parseBinaryExpr(lhs)
+	return p.parseBinaryExpr(lhs, LowestPrec + 1)
 }
 
 func (p *Parser) parseExprList(lhs bool) (list []Expr) {
+
 	list = append(list, p.parseExpr(lhs))
 	D("List size=", len(list), ", and tok=", p.tok.String())
 	for p.tok == COMMA {
@@ -120,6 +131,9 @@ func (p *Parser) parseLhsList() []Expr {
 
 func (p *Parser) parseSimpleStmt() (Stmt, bool) {
 	lhs := p.parseLhsList()
+
+
+
 	D("Lhs has been parsed, cur=", p.tok.String())
 	if len(lhs) > 1 {
 		p.error("Lhs should be length=1, but"+ strconv.Itoa(len(lhs)))
@@ -132,8 +146,8 @@ func (p *Parser) parseStmt() (s Stmt) {
 	switch p.tok {
 	case SYMBOL, INT, FLOAT, STRING,
 		ADD, SUB, MUL, DIV, LPAREN:
-		s, _ = p.parseSimpleStmt()
 		D("at parseStmt: ", p.tok.String())
+		s, _ = p.parseSimpleStmt()
 	case SEMICOLON:
 		s = &EmptyStmt{Semicolon: p.pos}
 		p.next()
@@ -148,7 +162,6 @@ func (p *Parser) parseStmtList() (list []Stmt) {
 	for p.tok != RBRACE && p.tok != EOF {
 		D("processing:", p.tok.String())
 		list = append(list, p.parseStmt())
-
 	}
 	D("Terminated Stmtlist", p.tok.String())
 	return

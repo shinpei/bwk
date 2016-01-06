@@ -138,6 +138,28 @@ func (tok TokenType) String() string{
 	return tokenDefs[tok]
 }
 
+const (
+	LowestPrec  = 0 // non-operators
+//	UnaryPrec   = 6
+//	HighestPrec = 7
+)
+
+func (tok TokenType) Precedence() int {
+	switch tok {
+//	case LOR:
+//		return 1
+//	case LAND:
+//		return 2
+	case EQL, NEQ/*, LSS, LEQ, GTR, GEQ*/:
+		return 3
+	case ADD, SUB/*, OR, XOR*/:
+		return 4
+	case MUL/*, QUO, REM, SHL, SHR, AND, AND_NOT*/:
+		return 5
+	}
+	return LowestPrec
+}
+
 func NewTokenizer() *Tokenizer {
 	tok := new(Tokenizer)
 	keywords = make(map[string]TokenType)
